@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mad-Hatter"
 include(":app")
+include(":core")
