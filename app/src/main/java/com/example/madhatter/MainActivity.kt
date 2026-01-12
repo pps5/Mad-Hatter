@@ -10,6 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.madhatter.home.HomeScreen
 import com.example.madhatter.transaction.TransactionEditorScreen
 import com.example.madhatter.ui.theme.MadHatterTheme
@@ -20,26 +25,54 @@ class MainActivity : ComponentActivity() {
         setContent {
             MadHatterTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    var currentScreen by remember { mutableStateOf<MainScreen>(MainScreen.Home) }
+                    val navController = rememberNavController()
                     var refreshSignal by remember { mutableStateOf(0) }
 
-                    when (val screen = currentScreen) {
-                        MainScreen.Home -> HomeScreen(
-                            refreshSignal = refreshSignal,
-                            onAddTransaction = {
-                                currentScreen = MainScreen.TransactionEditor()
-                            },
-                            onEditTransaction = { transactionId ->
-                                currentScreen = MainScreen.TransactionEditor(transactionId)
-                            },
-                        )
-                        is MainScreen.TransactionEditor -> TransactionEditorScreen(
-                            transactionId = screen.transactionId,
-                            onSaveSuccess = {
-                                currentScreen = MainScreen.Home
-                                refreshSignal += 1
-                            },
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = MainRoute.Home.route,
+                    ) {
+                        composable(MainRoute.Home.route) {
+                            HomeScreen(
+                                refreshSignal = refreshSignal,
+                                onAddTransaction = {
+                                    navController.navigate(MainRoute.TransactionEditor.route)
+                                },
+                                onEditTransaction = { transactionId ->
+                                    navController.navigate(
+                                        MainRoute.TransactionEditor.withTransactionId(transactionId),
+                                    )
+                                },
+                            )
+                        }
+                        composable(MainRoute.TransactionEditor.route) {
+                            TransactionEditorScreen(
+                                transactionId = null,
+                                onSaveSuccess = {
+                                    navController.popBackStack(MainRoute.Home.route, false)
+                                    refreshSignal += 1
+                                },
+                            )
+                        }
+                        composable(
+                            route = MainRoute.TransactionEditor.routeWithId,
+                            arguments = listOf(
+                                navArgument(MainRoute.TransactionEditor.transactionIdArgument) {
+                                    type = NavType.LongType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val transactionId = backStackEntry.arguments?.getLong(
+                                MainRoute.TransactionEditor.transactionIdArgument,
+                            )
+                            TransactionEditorScreen(
+                                transactionId = transactionId,
+                                onSaveSuccess = {
+                                    navController.popBackStack(MainRoute.Home.route, false)
+                                    refreshSignal += 1
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -47,8 +80,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private sealed class MainScreen {
-    data object Home : MainScreen()
+private sealed class MainRoute(val route: String) {
+    data object Home : MainRoute("home")
 
-    data class TransactionEditor(val transactionId: Long? = null) : MainScreen()
+    data object TransactionEditor : MainRoute("transaction-editor") {
+        const val transactionIdArgument = "transactionId"
+        const val routeWithId = "transaction-editor/{$transactionIdArgument}"
+
+        fun withTransactionId(transactionId: Long) = "transaction-editor/$transactionId"
+    }
 }
