@@ -15,7 +15,7 @@ data class Transaction(
     val amount: BigDecimal,
     val currencyCode: String,
     val type: TransactionType,
-    val categoryId: String,
+    val categoryId: Long,
     val memo: String,
 ) {
     fun validate(): List<String> {
@@ -35,8 +35,8 @@ data class Transaction(
             errors.add("currencyCode must be ISO-4217 format (e.g., USD)")
         }
 
-        if (categoryId.isBlank()) {
-            errors.add("categoryId is required")
+        if (categoryId <= 0L) {
+            errors.add("categoryId must be greater than 0")
         }
 
         if (memo.length > MEMO_MAX_LENGTH) {
