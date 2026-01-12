@@ -1,0 +1,26 @@
+<resources>
+    <string name="transaction_edit_title_new">取引追加</string>
+    <string name="transaction_edit_title_edit">取引編集</string>
+    <string name="transaction_edit_header">取引内容</string>
+    <string name="transaction_edit_subtitle">必要な項目を入力し、保存するとホームに戻ります。</string>
+    <string name="transaction_edit_timestamp_label">日時</string>
+    <string name="transaction_edit_timestamp_placeholder">YYYY-MM-DD HH:MM</string>
+    <string name="transaction_edit_timestamp_support">UTC基準の日時を入力してください。</string>
+    <string name="transaction_edit_amount_label">金額</string>
+    <string name="transaction_edit_amount_placeholder">0.00</string>
+    <string name="transaction_edit_currency_label">通貨</string>
+    <string name="transaction_edit_currency_placeholder">JPY</string>
+    <string name="transaction_edit_type_label">種別</string>
+    <string name="transaction_edit_type_income">収入</string>
+    <string name="transaction_edit_type_expense">支出</string>
+    <string name="transaction_edit_category_label">カテゴリ</string>
+    <string name="transaction_edit_category_placeholder">カテゴリを選択</string>
+    <string name="transaction_edit_category_support">種別に合わせたカテゴリを選択できます。</string>
+    <string name="transaction_edit_memo_label">メモ</string>
+    <string name="transaction_edit_memo_placeholder">内容の補足（任意）</string>
+    <string name="transaction_edit_memo_support">200文字以内で入力してください。</string>
+    <string name="transaction_edit_save">保存</string>
+    <string name="transaction_edit_delete">削除</string>
+    <string name="transaction_edit_cancel">取消</string>
+    <string name="transaction_edit_actions_hint">保存・取消後は取引一覧へ戻ります。</string>
+</resources>
