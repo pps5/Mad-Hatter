@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.madhatter.core.TransactionType
+import java.util.Locale
 
 class TransactionEditViewModel : ViewModel() {
     var state by mutableStateOf(defaultState())
@@ -19,7 +20,7 @@ class TransactionEditViewModel : ViewModel() {
     }
 
     fun onCurrencyCodeChange(value: String) {
-        state = state.copy(currencyCode = value.uppercase())
+        state = state.copy(currencyCode = value.uppercase(Locale.ROOT))
     }
 
     fun onTypeChange(value: TransactionType) {
