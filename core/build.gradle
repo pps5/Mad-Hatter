@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.sqldelight)
 }
 
@@ -33,4 +34,6 @@ sqldelight {
 dependencies {
     implementation libs.sqldelight.runtime
     implementation libs.sqldelight.android.driver
+    implementation libs.metro.runtime
+    ksp libs.metro.compiler
 }
