@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.madhatter.core.di.MetroDi
 
 data class HomeDashboardItem(
     val title: String,
@@ -29,36 +31,17 @@ data class HomeDashboardItem(
     val timestamp: String,
 )
 
-private val dummyHomeItems = listOf(
-    HomeDashboardItem(
-        title = "新作ティーハット",
-        description = "試作品のレビュー待ち",
-        status = "進行中",
-        timestamp = "10:15",
-    ),
-    HomeDashboardItem(
-        title = "お茶会の準備",
-        description = "フラミンゴ用の席を確保",
-        status = "完了",
-        timestamp = "09:30",
-    ),
-    HomeDashboardItem(
-        title = "帽子の在庫確認",
-        description = "シルク素材が残りわずか",
-        status = "注意",
-        timestamp = "昨日",
-    ),
-    HomeDashboardItem(
-        title = "新メニュー試作",
-        description = "アールグレイの香り調整",
-        status = "レビュー中",
-        timestamp = "2日前",
-    ),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(
+            categoryRepository = MetroDi.categoryRepository(),
+            transactionRepository = MetroDi.transactionRepository(),
+        ),
+    )
+    val uiState = homeViewModel.uiState
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -66,7 +49,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         },
     ) { paddingValues ->
         HomeContent(
-            items = dummyHomeItems,
+            items = uiState.items,
             modifier = Modifier.padding(paddingValues),
         )
     }
