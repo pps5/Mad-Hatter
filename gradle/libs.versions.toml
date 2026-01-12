@@ -9,6 +9,7 @@ composeCompiler = "1.5.8"
 material3 = "1.2.0"
 material = "1.12.0"
 sqldelight = "2.0.1"
+lifecycleViewModelCompose = "2.7.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -26,5 +27,6 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 google-material = { module = "com.google.android.material:material", version.ref = "material" }
+androidx-lifecycle-viewmodel-compose-home = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModelCompose" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
