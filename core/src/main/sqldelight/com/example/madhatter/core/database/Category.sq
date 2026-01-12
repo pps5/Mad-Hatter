@@ -2,8 +2,8 @@ CREATE TABLE categories (
   id INTEGER NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
-  is_preset BOOLEAN NOT NULL,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  is_preset INTEGER AS kotlin.Boolean NOT NULL,
+  is_active INTEGER AS kotlin.Boolean NOT NULL DEFAULT 1,
   parent_id INTEGER REFERENCES categories(id)
 );
 
