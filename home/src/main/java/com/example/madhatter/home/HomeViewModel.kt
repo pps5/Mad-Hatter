@@ -78,12 +78,16 @@ class HomeViewModel(
                 )
             }
         }
-        uiState = uiState.copy(items = items)
+        uiState = uiState.copy(
+            items = items,
+            latestTransactionId = latestTransaction?.id,
+        )
     }
 }
 
 data class HomeUiState(
     val items: List<HomeDashboardItem> = emptyList(),
+    val latestTransactionId: Long? = null,
 )
 
 class HomeViewModelFactory(
