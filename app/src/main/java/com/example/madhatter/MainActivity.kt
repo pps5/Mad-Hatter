@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.madhatter.category.CategoryEditorScreen
 import com.example.madhatter.home.HomeScreen
 import com.example.madhatter.transaction.TransactionEditorScreen
 import com.example.madhatter.ui.theme.MadHatterTheme
@@ -32,10 +33,27 @@ class MainActivity : ComponentActivity() {
                             onEditTransaction = { transactionId ->
                                 currentScreen = MainScreen.TransactionEditor(transactionId)
                             },
+                            onAddCategory = {
+                                currentScreen = MainScreen.CategoryEditor()
+                            },
+                            onEditCategory = { categoryId ->
+                                currentScreen = MainScreen.CategoryEditor(categoryId)
+                            },
                         )
                         is MainScreen.TransactionEditor -> TransactionEditorScreen(
                             transactionId = screen.transactionId,
                             onSaveSuccess = {
+                                currentScreen = MainScreen.Home
+                                refreshSignal += 1
+                            },
+                        )
+                        is MainScreen.CategoryEditor -> CategoryEditorScreen(
+                            categoryId = screen.categoryId,
+                            onSaveSuccess = {
+                                currentScreen = MainScreen.Home
+                                refreshSignal += 1
+                            },
+                            onDeleteSuccess = {
                                 currentScreen = MainScreen.Home
                                 refreshSignal += 1
                             },
@@ -51,4 +69,6 @@ private sealed class MainScreen {
     data object Home : MainScreen()
 
     data class TransactionEditor(val transactionId: Long? = null) : MainScreen()
+
+    data class CategoryEditor(val categoryId: Long? = null) : MainScreen()
 }

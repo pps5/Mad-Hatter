@@ -41,6 +41,8 @@ fun HomeScreen(
     refreshSignal: Int = 0,
     onAddTransaction: () -> Unit = {},
     onEditTransaction: (Long) -> Unit = {},
+    onAddCategory: () -> Unit = {},
+    onEditCategory: (Long) -> Unit = {},
 ) {
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
@@ -63,8 +65,11 @@ fun HomeScreen(
         HomeContent(
             items = uiState.items,
             latestTransactionId = uiState.latestTransactionId,
+            latestCategoryId = uiState.latestCategoryId,
             onAddTransaction = onAddTransaction,
             onEditTransaction = onEditTransaction,
+            onAddCategory = onAddCategory,
+            onEditCategory = onEditCategory,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -74,8 +79,11 @@ fun HomeScreen(
 private fun HomeContent(
     items: List<HomeDashboardItem>,
     latestTransactionId: Long?,
+    latestCategoryId: Long?,
     onAddTransaction: () -> Unit,
     onEditTransaction: (Long) -> Unit,
+    onAddCategory: () -> Unit,
+    onEditCategory: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -112,6 +120,20 @@ private fun HomeContent(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(text = "最新の取引を編集")
+                    }
+                }
+                OutlinedButton(
+                    onClick = onAddCategory,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = "カテゴリを追加")
+                }
+                if (latestCategoryId != null) {
+                    OutlinedButton(
+                        onClick = { onEditCategory(latestCategoryId) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(text = "最新のカテゴリを編集")
                     }
                 }
             }
