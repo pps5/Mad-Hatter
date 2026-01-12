@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.2.2"
+androidGradlePlugin = "8.6.0"
 kotlin = "1.9.22"
 coreKtx = "1.12.0"
 appcompat = "1.6.1"
@@ -10,6 +10,7 @@ material3 = "1.2.0"
 material = "1.12.0"
 sqldelight = "2.0.1"
 lifecycle = "2.7.0"
+navigationCompose = "2.9.6"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -28,6 +29,7 @@ androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 google-material = { module = "com.google.android.material:material", version.ref = "material" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
