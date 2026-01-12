@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.sqldelight)
 }
 
 android {
@@ -19,4 +20,17 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+sqldelight {
+    databases {
+        MadHatterDatabase {
+            packageName = "com.example.madhatter.core.database"
+        }
+    }
+}
+
+dependencies {
+    implementation libs.sqldelight.runtime
+    implementation libs.sqldelight.android.driver
 }
