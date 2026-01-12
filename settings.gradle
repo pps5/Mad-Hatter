@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mad-Hatter"
 include(":app")
+include(":category")
 include(":core")
 include(":home")
 include(":transaction")

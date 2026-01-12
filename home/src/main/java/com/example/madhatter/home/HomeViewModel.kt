@@ -29,6 +29,7 @@ class HomeViewModel(
         val categories = categoryRepository.getActive()
         val transactions = transactionRepository.getAll()
         val latestTransaction = transactions.maxByOrNull { it.transaction.timestamp }
+        val latestCategoryId = categories.maxByOrNull { it.id }?.id
         val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm", Locale.JAPAN)
         val latestTimestamp = latestTransaction?.transaction?.timestamp?.formatWith(formatter) ?: "-"
         val items = buildList {
@@ -81,6 +82,7 @@ class HomeViewModel(
         uiState = uiState.copy(
             items = items,
             latestTransactionId = latestTransaction?.id,
+            latestCategoryId = latestCategoryId,
         )
     }
 }
@@ -88,6 +90,7 @@ class HomeViewModel(
 data class HomeUiState(
     val items: List<HomeDashboardItem> = emptyList(),
     val latestTransactionId: Long? = null,
+    val latestCategoryId: Long? = null,
 )
 
 class HomeViewModelFactory(

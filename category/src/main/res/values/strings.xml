@@ -1,0 +1,16 @@
+<resources>
+    <string name="category_editor_add_title">カテゴリを追加</string>
+    <string name="category_editor_edit_title">カテゴリを編集</string>
+    <string name="category_editor_name_label">カテゴリ名</string>
+    <string name="category_editor_type_label">種別</string>
+    <string name="category_editor_type_income">収入</string>
+    <string name="category_editor_type_expense">支出</string>
+    <string name="category_editor_parent_label">親カテゴリ</string>
+    <string name="category_editor_parent_placeholder">親カテゴリを選択</string>
+    <string name="category_editor_parent_none">親カテゴリなし</string>
+    <string name="category_editor_active_label">有効</string>
+    <string name="category_editor_save">保存</string>
+    <string name="category_editor_delete">削除</string>
+    <string name="category_editor_error_header">入力内容を確認してください</string>
+    <string name="category_editor_error_name_required">カテゴリ名を入力してください。</string>
+</resources>
