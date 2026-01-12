@@ -18,3 +18,4 @@ rootProject.name = "Mad-Hatter"
 include(":app")
 include(":core")
 include(":home")
+include(":transaction")
