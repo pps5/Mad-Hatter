@@ -16,7 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +36,12 @@ data class HomeDashboardItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    refreshSignal: Int = 0,
+    onAddTransaction: () -> Unit = {},
+    onEditTransaction: (Long) -> Unit = {},
+) {
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
             categoryRepository = MetroDi.categoryRepository(),
@@ -41,6 +49,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         ),
     )
     val uiState = homeViewModel.uiState
+
+    LaunchedEffect(refreshSignal) {
+        homeViewModel.loadDashboard()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -50,6 +62,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     ) { paddingValues ->
         HomeContent(
             items = uiState.items,
+            latestTransactionId = uiState.latestTransactionId,
+            onAddTransaction = onAddTransaction,
+            onEditTransaction = onEditTransaction,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -58,6 +73,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun HomeContent(
     items: List<HomeDashboardItem>,
+    latestTransactionId: Long?,
+    onAddTransaction: () -> Unit,
+    onEditTransaction: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -77,6 +95,25 @@ private fun HomeContent(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(
+                    onClick = onAddTransaction,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = "取引を追加")
+                }
+                if (latestTransactionId != null) {
+                    OutlinedButton(
+                        onClick = { onEditTransaction(latestTransactionId) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(text = "最新の取引を編集")
+                    }
+                }
             }
         }
 
