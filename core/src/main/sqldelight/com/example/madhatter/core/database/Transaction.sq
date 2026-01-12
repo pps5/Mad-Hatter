@@ -1,0 +1,40 @@
+CREATE TABLE transactions (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  timestamp TEXT NOT NULL,
+  amount TEXT NOT NULL,
+  currency_code TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
+  category_id INTEGER NOT NULL REFERENCES categories(id),
+  memo TEXT NOT NULL CHECK (length(memo) <= 200)
+);
+
+selectTransactionById:
+SELECT *
+FROM transactions
+WHERE id = ?;
+
+selectAllTransactions:
+SELECT *
+FROM transactions
+ORDER BY timestamp DESC;
+
+selectTransactionsByCategory:
+SELECT *
+FROM transactions
+WHERE category_id = ?
+ORDER BY timestamp DESC;
+
+insertTransaction:
+INSERT INTO transactions(
+  timestamp,
+  amount,
+  currency_code,
+  type,
+  category_id,
+  memo
+)
+VALUES (?, ?, ?, ?, ?, ?);
+
+deleteTransactionById:
+DELETE FROM transactions
+WHERE id = ?;

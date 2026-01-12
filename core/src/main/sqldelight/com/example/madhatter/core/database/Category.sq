@@ -1,0 +1,54 @@
+CREATE TABLE categories (
+  id INTEGER NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
+  is_preset INTEGER AS kotlin.Boolean NOT NULL,
+  is_active INTEGER AS kotlin.Boolean NOT NULL DEFAULT 1,
+  parent_id INTEGER REFERENCES categories(id)
+);
+
+selectCategoryById:
+SELECT *
+FROM categories
+WHERE id = ?;
+
+selectAllCategories:
+SELECT *
+FROM categories
+ORDER BY name;
+
+selectActiveCategories:
+SELECT *
+FROM categories
+WHERE is_active = 1
+ORDER BY name;
+
+selectSubcategories:
+SELECT *
+FROM categories
+WHERE parent_id = ?
+ORDER BY name;
+
+insertCategory:
+INSERT INTO categories(
+  id,
+  name,
+  type,
+  is_preset,
+  is_active,
+  parent_id
+)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateCategory:
+UPDATE categories
+SET name = ?,
+    type = ?,
+    is_preset = ?,
+    is_active = ?,
+    parent_id = ?
+WHERE id = ?;
+
+deleteCategory:
+DELETE FROM categories
+WHERE id = ?;
