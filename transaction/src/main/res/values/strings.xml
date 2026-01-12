@@ -1,0 +1,22 @@
+<resources>
+    <string name="transaction_editor_add_title">取引を追加</string>
+    <string name="transaction_editor_edit_title">取引を編集</string>
+    <string name="transaction_editor_amount_label">金額</string>
+    <string name="transaction_editor_currency_label">通貨コード</string>
+    <string name="transaction_editor_category_label">カテゴリ</string>
+    <string name="transaction_editor_category_placeholder">カテゴリを選択</string>
+    <string name="transaction_editor_type_label">種別</string>
+    <string name="transaction_editor_type_income">収入</string>
+    <string name="transaction_editor_type_expense">支出</string>
+    <string name="transaction_editor_memo_label">メモ</string>
+    <string name="transaction_editor_timestamp_label">記録日時</string>
+    <string name="transaction_editor_save">保存</string>
+    <string name="transaction_editor_category_empty">利用可能なカテゴリがありません。</string>
+    <string name="transaction_editor_error_header">入力内容を確認してください</string>
+    <string name="transaction_editor_error_amount_required">金額を入力してください。</string>
+    <string name="transaction_editor_error_amount_invalid">金額は0.01以上で入力してください。</string>
+    <string name="transaction_editor_error_currency_required">通貨コードを入力してください。</string>
+    <string name="transaction_editor_error_currency_invalid">通貨コードは3文字の英字で入力してください。</string>
+    <string name="transaction_editor_error_category_required">カテゴリを選択してください。</string>
+    <string name="transaction_editor_error_memo_too_long">メモは200文字以内で入力してください。</string>
+</resources>
