@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.madhatter.category.CategoryEditorScreen
 import com.example.madhatter.home.HomeScreen
+import com.example.madhatter.settings.SettingsScreen
 import com.example.madhatter.transaction.TransactionEditorScreen
 import com.example.madhatter.ui.theme.MadHatterTheme
 
@@ -47,6 +48,9 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onEditCategory = { categoryId ->
                                     navController.navigate(MainRoute.categoryEditorWithId(categoryId))
+                                },
+                                onOpenSettings = {
+                                    navController.navigate(MainRoute.Settings)
                                 },
                             )
                         }
@@ -98,6 +102,9 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
                         }
+                        composable(MainRoute.Settings) {
+                            SettingsScreen()
+                        }
                     }
                 }
             }
@@ -111,6 +118,7 @@ private object MainRoute {
     const val CategoryIdArg = "categoryId"
     const val TransactionEditor = "transactionEditor?$TransactionIdArg={$TransactionIdArg}"
     const val CategoryEditor = "categoryEditor?$CategoryIdArg={$CategoryIdArg}"
+    const val Settings = "settings"
 
     fun transactionEditorWithId(transactionId: Long) =
         "transactionEditor?$TransactionIdArg=$transactionId"

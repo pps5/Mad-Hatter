@@ -9,6 +9,7 @@ import com.example.madhatter.core.Category
 import com.example.madhatter.core.Transaction
 import com.example.madhatter.core.TransactionType
 import com.example.madhatter.core.repository.CategoryRepository
+import com.example.madhatter.core.repository.SettingsRepository
 import com.example.madhatter.core.repository.TransactionRepository
 import java.math.BigDecimal
 import java.time.Instant
@@ -19,6 +20,7 @@ import java.util.Locale
 class TransactionEditorViewModel(
     private val categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
+    private val settingsRepository: SettingsRepository,
     private val transactionId: Long?,
 ) : ViewModel() {
     var uiState by mutableStateOf(TransactionEditorUiState())
@@ -38,13 +40,6 @@ class TransactionEditorViewModel(
 
     fun onMemoChange(memo: String) {
         uiState = uiState.copy(memoInput = memo)
-    }
-
-    fun onDefaultCurrencySelected(currencyCode: String) {
-        uiState = uiState.copy(
-            defaultCurrencyCode = currencyCode,
-            currencyInput = currencyCode,
-        )
     }
 
     fun onTypeChange(type: TransactionType) {
@@ -91,11 +86,13 @@ class TransactionEditorViewModel(
         val transaction = storedTransaction?.transaction
         val timestamp = transaction?.timestamp ?: Instant.now()
         val selectedCategoryId = transaction?.categoryId ?: categories.firstOrNull()?.id
-        val defaultCurrencyCode = transaction?.currencyCode ?: DEFAULT_CURRENCY_CODE
+        val storedDefaultCurrency = settingsRepository.getDefaultCurrencyCode()
+        val defaultCurrencyCode = storedDefaultCurrency
+        val initialCurrencyCode = transaction?.currencyCode ?: defaultCurrencyCode
         uiState = uiState.copy(
             isEditing = transaction != null,
             amountInput = transaction?.amount?.stripTrailingZeros()?.toPlainString().orEmpty(),
-            currencyInput = transaction?.currencyCode ?: defaultCurrencyCode,
+            currencyInput = initialCurrencyCode,
             memoInput = transaction?.memo.orEmpty(),
             type = transaction?.type ?: TransactionType.EXPENSE,
             categories = categories,
@@ -103,7 +100,6 @@ class TransactionEditorViewModel(
             timestamp = timestamp,
             formattedTimestamp = formatTimestamp(timestamp),
             defaultCurrencyCode = defaultCurrencyCode,
-            currencyPresets = CURRENCY_PRESETS,
         )
     }
 
@@ -146,17 +142,6 @@ class TransactionEditorViewModel(
         private val MIN_UNIT = BigDecimal("0.01")
         private val CURRENCY_REGEX = Regex("^[A-Z]{3}$")
         private const val MEMO_MAX_LENGTH = 200
-        private const val DEFAULT_CURRENCY_CODE = "JPY"
-        private val CURRENCY_PRESETS = listOf(
-            "JPY",
-            "USD",
-            "EUR",
-            "GBP",
-            "AUD",
-            "CAD",
-            "CHF",
-            "CNY",
-        )
     }
 }
 
@@ -172,7 +157,6 @@ data class TransactionEditorUiState(
     val formattedTimestamp: String = "",
     val validationErrors: List<TransactionEditorValidationError> = emptyList(),
     val defaultCurrencyCode: String = "",
-    val currencyPresets: List<String> = emptyList(),
 )
 
 enum class TransactionEditorValidationError {
@@ -187,6 +171,7 @@ enum class TransactionEditorValidationError {
 class TransactionEditorViewModelFactory(
     private val categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
+    private val settingsRepository: SettingsRepository,
     private val transactionId: Long?,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -195,6 +180,7 @@ class TransactionEditorViewModelFactory(
             return TransactionEditorViewModel(
                 categoryRepository,
                 transactionRepository,
+                settingsRepository,
                 transactionId,
             ) as T
         }

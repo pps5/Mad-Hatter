@@ -3,9 +3,8 @@
     <string name="transaction_editor_edit_title">取引を編集</string>
     <string name="transaction_editor_amount_label">金額</string>
     <string name="transaction_editor_currency_label">通貨コード</string>
-    <string name="transaction_editor_currency_preset_label">通貨コードのプリセット</string>
     <string name="transaction_editor_currency_default_label">既定の通貨コード</string>
-    <string name="transaction_editor_currency_preset_helper">選択したコードを通貨入力に適用します。</string>
+    <string name="transaction_editor_currency_default_helper">設定画面で既定の通貨コードを変更できます。</string>
     <string name="transaction_editor_category_label">カテゴリ</string>
     <string name="transaction_editor_category_placeholder">カテゴリを選択</string>
     <string name="transaction_editor_type_label">種別</string>
