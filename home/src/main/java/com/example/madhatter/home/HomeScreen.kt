@@ -17,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -26,13 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.madhatter.core.di.MetroDi
-
-data class HomeDashboardItem(
-    val title: String,
-    val description: String,
-    val status: String,
-    val timestamp: String,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,13 +55,10 @@ fun HomeScreen(
         },
     ) { paddingValues ->
         HomeContent(
-            items = uiState.items,
-            latestTransactionId = uiState.latestTransactionId,
-            latestCategoryId = uiState.latestCategoryId,
+            summary = uiState.summary,
+            latestTransactions = uiState.latestTransactions,
             onAddTransaction = onAddTransaction,
             onEditTransaction = onEditTransaction,
-            onAddCategory = onAddCategory,
-            onEditCategory = onEditCategory,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -77,13 +66,10 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
-    items: List<HomeDashboardItem>,
-    latestTransactionId: Long?,
-    latestCategoryId: Long?,
+    summary: TransactionSummary,
+    latestTransactions: List<LatestTransactionItem>,
     onAddTransaction: () -> Unit,
     onEditTransaction: (Long) -> Unit,
-    onAddCategory: () -> Unit,
-    onEditCategory: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -92,7 +78,7 @@ private fun HomeContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "ダッシュボード",
                     style = MaterialTheme.typography.headlineSmall,
@@ -107,48 +93,46 @@ private fun HomeContent(
         }
 
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(
-                    onClick = onAddTransaction,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(text = "取引を追加")
-                }
-                if (latestTransactionId != null) {
-                    OutlinedButton(
-                        onClick = { onEditTransaction(latestTransactionId) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(text = "最新の取引を編集")
-                    }
-                }
-                OutlinedButton(
-                    onClick = onAddCategory,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(text = "カテゴリを追加")
-                }
-                if (latestCategoryId != null) {
-                    OutlinedButton(
-                        onClick = { onEditCategory(latestCategoryId) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(text = "最新のカテゴリを編集")
-                    }
+            Button(
+                onClick = onAddTransaction,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "取引を追加")
+            }
+        }
+
+        item {
+            SummaryCard(summary = summary)
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "最新の取引",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (latestTransactions.isEmpty()) {
+                    Text(
+                        text = "まだ取引が登録されていません。",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
 
-        items(items) { item ->
+        items(latestTransactions) { transaction ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
+                onClick = { onEditTransaction(transaction.id) },
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -156,27 +140,86 @@ private fun HomeContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleMedium,
+                            text = transaction.title,
+                            style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
-                            text = item.status,
+                            text = transaction.typeLabel,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
                     Text(
-                        text = item.description,
+                        text = "${transaction.amount} ${transaction.currencyCode}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = item.timestamp,
+                        text = transaction.timestamp,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SummaryCard(
+    summary: TransactionSummary,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = "取引サマリー",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            SummaryRow(label = "取引件数", value = "${summary.transactionCount}件")
+            SummaryRow(
+                label = "収入合計",
+                value = "${summary.incomeTotal.stripTrailingZeros().toPlainString()} ${summary.currencyLabel}",
+            )
+            SummaryRow(
+                label = "支出合計",
+                value = "${summary.expenseTotal.stripTrailingZeros().toPlainString()} ${summary.currencyLabel}",
+            )
+            SummaryRow(
+                label = "収支",
+                value = "${summary.netTotal.stripTrailingZeros().toPlainString()} ${summary.currencyLabel}",
+            )
+        }
+    }
+}
+
+@Composable
+private fun SummaryRow(
+    label: String,
+    value: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+        )
     }
 }

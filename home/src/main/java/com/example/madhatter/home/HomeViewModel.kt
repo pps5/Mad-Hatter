@@ -31,56 +31,24 @@ class HomeViewModel(
         val latestTransaction = transactions.maxByOrNull { it.transaction.timestamp }
         val latestCategoryId = categories.maxByOrNull { it.id }?.id
         val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm", Locale.JAPAN)
-        val latestTimestamp = latestTransaction?.transaction?.timestamp?.formatWith(formatter) ?: "-"
-        val items = buildList {
-            add(
-                HomeDashboardItem(
-                    title = "アクティブカテゴリ",
-                    description = "${categories.size}件のカテゴリが利用可能です。",
-                    status = "カテゴリ",
-                    timestamp = "現在",
-                ),
-            )
-            add(
-                HomeDashboardItem(
-                    title = "登録済み取引",
-                    description = "全${transactions.size}件の取引があります。",
-                    status = "取引",
-                    timestamp = latestTimestamp,
-                ),
-            )
-            latestTransaction?.let { stored ->
+        val summary = buildSummary(transactions)
+        val latestTransactions = transactions
+            .sortedByDescending { it.transaction.timestamp }
+            .take(5)
+            .map { stored ->
                 val transaction = stored.transaction
-                add(
-                    HomeDashboardItem(
-                        title = "最新の取引",
-                        description = buildString {
-                            append(formatAmount(transaction.amount))
-                            append(" ")
-                            append(transaction.currencyCode)
-                            append(" ・ ")
-                            append(transaction.memo.ifBlank { "メモなし" })
-                        },
-                        status = transaction.type.toLabel(),
-                        timestamp = transaction.timestamp.formatWith(formatter),
-                    ),
+                LatestTransactionItem(
+                    id = stored.id,
+                    title = transaction.memo.ifBlank { "メモなし" },
+                    amount = formatAmount(transaction.amount),
+                    currencyCode = transaction.currencyCode,
+                    typeLabel = transaction.type.toLabel(),
+                    timestamp = transaction.timestamp.formatWith(formatter),
                 )
             }
-            if (categories.isNotEmpty()) {
-                add(
-                    HomeDashboardItem(
-                        title = "最近のカテゴリ",
-                        description = categories
-                            .take(3)
-                            .joinToString(separator = "、") { it.name },
-                        status = "カテゴリ",
-                        timestamp = "-",
-                    ),
-                )
-            }
-        }
         uiState = uiState.copy(
-            items = items,
+            summary = summary,
+            latestTransactions = latestTransactions,
             latestTransactionId = latestTransaction?.id,
             latestCategoryId = latestCategoryId,
         )
@@ -88,7 +56,8 @@ class HomeViewModel(
 }
 
 data class HomeUiState(
-    val items: List<HomeDashboardItem> = emptyList(),
+    val summary: TransactionSummary = TransactionSummary(),
+    val latestTransactions: List<LatestTransactionItem> = emptyList(),
     val latestTransactionId: Long? = null,
     val latestCategoryId: Long? = null,
 )
@@ -120,3 +89,42 @@ private fun TransactionType.toLabel(): String {
 private fun formatAmount(amount: BigDecimal): String {
     return amount.stripTrailingZeros().toPlainString()
 }
+
+private fun buildSummary(transactions: List<com.example.madhatter.core.repository.StoredTransaction>): TransactionSummary {
+    val incomeTotal = transactions
+        .filter { it.transaction.type == TransactionType.INCOME }
+        .fold(BigDecimal.ZERO) { acc, stored -> acc + stored.transaction.amount }
+    val expenseTotal = transactions
+        .filter { it.transaction.type == TransactionType.EXPENSE }
+        .fold(BigDecimal.ZERO) { acc, stored -> acc + stored.transaction.amount }
+    val currencyCodes = transactions.map { it.transaction.currencyCode }.distinct()
+    val currencyLabel = when (currencyCodes.size) {
+        0 -> "-"
+        1 -> currencyCodes.first()
+        else -> "複数通貨"
+    }
+    return TransactionSummary(
+        transactionCount = transactions.size,
+        incomeTotal = incomeTotal,
+        expenseTotal = expenseTotal,
+        netTotal = incomeTotal - expenseTotal,
+        currencyLabel = currencyLabel,
+    )
+}
+
+data class TransactionSummary(
+    val transactionCount: Int = 0,
+    val incomeTotal: BigDecimal = BigDecimal.ZERO,
+    val expenseTotal: BigDecimal = BigDecimal.ZERO,
+    val netTotal: BigDecimal = BigDecimal.ZERO,
+    val currencyLabel: String = "-",
+)
+
+data class LatestTransactionItem(
+    val id: Long,
+    val title: String,
+    val amount: String,
+    val currencyCode: String,
+    val typeLabel: String,
+    val timestamp: String,
+)
