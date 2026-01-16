@@ -10,6 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.madhatter.category.CategoryEditorScreen
 import com.example.madhatter.home.HomeScreen
 import com.example.madhatter.transaction.TransactionEditorScreen
@@ -21,43 +26,78 @@ class MainActivity : ComponentActivity() {
         setContent {
             MadHatterTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    var currentScreen by remember { mutableStateOf<MainScreen>(MainScreen.Home) }
                     var refreshSignal by remember { mutableStateOf(0) }
+                    val navController = rememberNavController()
 
-                    when (val screen = currentScreen) {
-                        MainScreen.Home -> HomeScreen(
-                            refreshSignal = refreshSignal,
-                            onAddTransaction = {
-                                currentScreen = MainScreen.TransactionEditor()
-                            },
-                            onEditTransaction = { transactionId ->
-                                currentScreen = MainScreen.TransactionEditor(transactionId)
-                            },
-                            onAddCategory = {
-                                currentScreen = MainScreen.CategoryEditor()
-                            },
-                            onEditCategory = { categoryId ->
-                                currentScreen = MainScreen.CategoryEditor(categoryId)
-                            },
-                        )
-                        is MainScreen.TransactionEditor -> TransactionEditorScreen(
-                            transactionId = screen.transactionId,
-                            onSaveSuccess = {
-                                currentScreen = MainScreen.Home
-                                refreshSignal += 1
-                            },
-                        )
-                        is MainScreen.CategoryEditor -> CategoryEditorScreen(
-                            categoryId = screen.categoryId,
-                            onSaveSuccess = {
-                                currentScreen = MainScreen.Home
-                                refreshSignal += 1
-                            },
-                            onDeleteSuccess = {
-                                currentScreen = MainScreen.Home
-                                refreshSignal += 1
-                            },
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = MainRoute.Home,
+                    ) {
+                        composable(MainRoute.Home) {
+                            HomeScreen(
+                                refreshSignal = refreshSignal,
+                                onAddTransaction = {
+                                    navController.navigate(MainRoute.TransactionEditor)
+                                },
+                                onEditTransaction = { transactionId ->
+                                    navController.navigate(MainRoute.transactionEditorWithId(transactionId))
+                                },
+                                onAddCategory = {
+                                    navController.navigate(MainRoute.CategoryEditor)
+                                },
+                                onEditCategory = { categoryId ->
+                                    navController.navigate(MainRoute.categoryEditorWithId(categoryId))
+                                },
+                            )
+                        }
+                        composable(
+                            route = MainRoute.TransactionEditor,
+                            arguments = listOf(
+                                navArgument(MainRoute.TransactionIdArg) {
+                                    type = NavType.StringType
+                                    nullable = true
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val transactionId =
+                                backStackEntry.arguments?.getString(MainRoute.TransactionIdArg)?.toLongOrNull()
+                            TransactionEditorScreen(
+                                transactionId = transactionId,
+                                onSaveSuccess = {
+                                    refreshSignal += 1
+                                    navController.navigate(MainRoute.Home) {
+                                        popUpTo(MainRoute.Home) { inclusive = true }
+                                    }
+                                },
+                            )
+                        }
+                        composable(
+                            route = MainRoute.CategoryEditor,
+                            arguments = listOf(
+                                navArgument(MainRoute.CategoryIdArg) {
+                                    type = NavType.StringType
+                                    nullable = true
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val categoryId =
+                                backStackEntry.arguments?.getString(MainRoute.CategoryIdArg)?.toLongOrNull()
+                            CategoryEditorScreen(
+                                categoryId = categoryId,
+                                onSaveSuccess = {
+                                    refreshSignal += 1
+                                    navController.navigate(MainRoute.Home) {
+                                        popUpTo(MainRoute.Home) { inclusive = true }
+                                    }
+                                },
+                                onDeleteSuccess = {
+                                    refreshSignal += 1
+                                    navController.navigate(MainRoute.Home) {
+                                        popUpTo(MainRoute.Home) { inclusive = true }
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -65,10 +105,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private sealed class MainScreen {
-    data object Home : MainScreen()
+private object MainRoute {
+    const val Home = "home"
+    const val TransactionIdArg = "transactionId"
+    const val CategoryIdArg = "categoryId"
+    const val TransactionEditor = "transactionEditor?$TransactionIdArg={$TransactionIdArg}"
+    const val CategoryEditor = "categoryEditor?$CategoryIdArg={$CategoryIdArg}"
 
-    data class TransactionEditor(val transactionId: Long? = null) : MainScreen()
+    fun transactionEditorWithId(transactionId: Long) =
+        "transactionEditor?$TransactionIdArg=$transactionId"
 
-    data class CategoryEditor(val categoryId: Long? = null) : MainScreen()
+    fun categoryEditorWithId(categoryId: Long) =
+        "categoryEditor?$CategoryIdArg=$categoryId"
 }

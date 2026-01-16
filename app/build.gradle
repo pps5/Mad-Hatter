@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace "com.example.madhatter"
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.madhatter"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
     }
@@ -54,6 +54,7 @@ dependencies {
     implementation libs.androidx.compose.material3
     implementation libs.androidx.compose.ui
     implementation libs.androidx.compose.ui.tooling.preview
+    implementation libs.androidx.navigation.compose
 
     debugImplementation "androidx.compose.ui:ui-tooling"
 }
