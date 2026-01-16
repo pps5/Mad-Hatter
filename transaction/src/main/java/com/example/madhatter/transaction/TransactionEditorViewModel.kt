@@ -40,6 +40,13 @@ class TransactionEditorViewModel(
         uiState = uiState.copy(memoInput = memo)
     }
 
+    fun onDefaultCurrencySelected(currencyCode: String) {
+        uiState = uiState.copy(
+            defaultCurrencyCode = currencyCode,
+            currencyInput = currencyCode,
+        )
+    }
+
     fun onTypeChange(type: TransactionType) {
         uiState = uiState.copy(type = type)
     }
@@ -84,16 +91,19 @@ class TransactionEditorViewModel(
         val transaction = storedTransaction?.transaction
         val timestamp = transaction?.timestamp ?: Instant.now()
         val selectedCategoryId = transaction?.categoryId ?: categories.firstOrNull()?.id
+        val defaultCurrencyCode = transaction?.currencyCode ?: DEFAULT_CURRENCY_CODE
         uiState = uiState.copy(
             isEditing = transaction != null,
             amountInput = transaction?.amount?.stripTrailingZeros()?.toPlainString().orEmpty(),
-            currencyInput = transaction?.currencyCode.orEmpty(),
+            currencyInput = transaction?.currencyCode ?: defaultCurrencyCode,
             memoInput = transaction?.memo.orEmpty(),
             type = transaction?.type ?: TransactionType.EXPENSE,
             categories = categories,
             selectedCategoryId = selectedCategoryId,
             timestamp = timestamp,
             formattedTimestamp = formatTimestamp(timestamp),
+            defaultCurrencyCode = defaultCurrencyCode,
+            currencyPresets = CURRENCY_PRESETS,
         )
     }
 
@@ -136,6 +146,17 @@ class TransactionEditorViewModel(
         private val MIN_UNIT = BigDecimal("0.01")
         private val CURRENCY_REGEX = Regex("^[A-Z]{3}$")
         private const val MEMO_MAX_LENGTH = 200
+        private const val DEFAULT_CURRENCY_CODE = "JPY"
+        private val CURRENCY_PRESETS = listOf(
+            "JPY",
+            "USD",
+            "EUR",
+            "GBP",
+            "AUD",
+            "CAD",
+            "CHF",
+            "CNY",
+        )
     }
 }
 
@@ -150,6 +171,8 @@ data class TransactionEditorUiState(
     val timestamp: Instant = Instant.now(),
     val formattedTimestamp: String = "",
     val validationErrors: List<TransactionEditorValidationError> = emptyList(),
+    val defaultCurrencyCode: String = "",
+    val currencyPresets: List<String> = emptyList(),
 )
 
 enum class TransactionEditorValidationError {
