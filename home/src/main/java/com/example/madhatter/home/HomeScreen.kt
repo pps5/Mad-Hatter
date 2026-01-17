@@ -35,6 +35,7 @@ fun HomeScreen(
     onEditTransaction: (Long) -> Unit = {},
     onAddCategory: () -> Unit = {},
     onEditCategory: (Long) -> Unit = {},
+    onOpenSettings: () -> Unit = {},
 ) {
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
@@ -59,6 +60,7 @@ fun HomeScreen(
             latestTransactions = uiState.latestTransactions,
             onAddTransaction = onAddTransaction,
             onEditTransaction = onEditTransaction,
+            onOpenSettings = onOpenSettings,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -70,6 +72,7 @@ private fun HomeContent(
     latestTransactions: List<LatestTransactionItem>,
     onAddTransaction: () -> Unit,
     onEditTransaction: (Long) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -98,6 +101,15 @@ private fun HomeContent(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = "取引を追加")
+            }
+        }
+
+        item {
+            Button(
+                onClick = onOpenSettings,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "設定")
             }
         }
 

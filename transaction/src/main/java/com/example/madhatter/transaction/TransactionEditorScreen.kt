@@ -47,6 +47,7 @@ fun TransactionEditorScreen(
         factory = TransactionEditorViewModelFactory(
             categoryRepository = MetroDi.categoryRepository(),
             transactionRepository = MetroDi.transactionRepository(),
+            settingsRepository = MetroDi.settingsRepository(),
             transactionId = transactionId,
         ),
     )
@@ -68,7 +69,6 @@ fun TransactionEditorScreen(
             modifier = Modifier.padding(paddingValues),
             onAmountChange = transactionViewModel::onAmountChange,
             onCurrencyChange = transactionViewModel::onCurrencyChange,
-            onDefaultCurrencySelected = transactionViewModel::onDefaultCurrencySelected,
             onMemoChange = transactionViewModel::onMemoChange,
             onCategorySelected = transactionViewModel::onCategorySelected,
             onTypeChange = transactionViewModel::onTypeChange,
@@ -87,7 +87,6 @@ private fun TransactionEditorContent(
     uiState: TransactionEditorUiState,
     onAmountChange: (String) -> Unit,
     onCurrencyChange: (String) -> Unit,
-    onDefaultCurrencySelected: (String) -> Unit,
     onMemoChange: (String) -> Unit,
     onCategorySelected: (Long) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
@@ -95,7 +94,6 @@ private fun TransactionEditorContent(
     modifier: Modifier = Modifier,
 ) {
     var categoryExpanded by remember { mutableStateOf(false) }
-    var currencyPresetExpanded by remember { mutableStateOf(false) }
     val selectedCategory = uiState.categories.firstOrNull { it.id == uiState.selectedCategoryId }
 
     Column(
@@ -127,46 +125,17 @@ private fun TransactionEditorContent(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(
-                text = stringResource(R.string.transaction_editor_currency_preset_label),
+                text = stringResource(R.string.transaction_editor_currency_default_label),
                 style = MaterialTheme.typography.titleSmall,
             )
-            ExposedDropdownMenuBox(
-                expanded = currencyPresetExpanded,
-                onExpandedChange = { currencyPresetExpanded = !currencyPresetExpanded },
-            ) {
-                OutlinedTextField(
-                    value = uiState.defaultCurrencyCode,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = {
-                        Text(text = stringResource(R.string.transaction_editor_currency_default_label))
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = currencyPresetExpanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                )
-                ExposedDropdownMenu(
-                    expanded = currencyPresetExpanded,
-                    onDismissRequest = { currencyPresetExpanded = false },
-                ) {
-                    uiState.currencyPresets.forEach { currencyCode ->
-                        DropdownMenuItem(
-                            text = { Text(text = currencyCode) },
-                            onClick = {
-                                onDefaultCurrencySelected(currencyCode)
-                                currencyPresetExpanded = false
-                            },
-                        )
-                    }
-                }
-            }
             Text(
-                text = stringResource(R.string.transaction_editor_currency_preset_helper),
+                text = uiState.defaultCurrencyCode,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text = stringResource(R.string.transaction_editor_currency_default_helper),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

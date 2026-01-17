@@ -44,6 +44,7 @@ dependencies {
     implementation project(":category")
     implementation project(":core")
     implementation project(":home")
+    implementation project(":settings")
     implementation project(":transaction")
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
